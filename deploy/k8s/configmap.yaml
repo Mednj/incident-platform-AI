@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: incident-platform-config
+  namespace: incident-platform
+data:
+  POSTGRES_DB: incident_platform
+  POSTGRES_HOST: postgres
+  POSTGRES_PORT: "5432"
+  POSTGRES_USER: incident
+  KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+  SCHEMA_REGISTRY_URL: http://schema-registry:8081
+  JWT_ISSUER: incident-platform
+  AI_PROVIDER: local
+  AI_MODEL: local-investigation-summary-v1
+

@@ -1,0 +1,46 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: incident-platform
+  namespace: incident-platform
+spec:
+  rules:
+    - host: incident-platform.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+          - path: /api/auth
+            pathType: Prefix
+            backend:
+              service:
+                name: auth-service
+                port:
+                  number: 8080
+          - path: /api/logs
+            pathType: Prefix
+            backend:
+              service:
+                name: ingestion-service
+                port:
+                  number: 8080
+          - path: /api/incidents
+            pathType: Prefix
+            backend:
+              service:
+                name: incident-service
+                port:
+                  number: 8080
+          - path: /api/ai
+            pathType: Prefix
+            backend:
+              service:
+                name: ai-analysis-service
+                port:
+                  number: 8080
+
