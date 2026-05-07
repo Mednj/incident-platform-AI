@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ingestion-service
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: io.confluent.kafka.serializers.KafkaAvroSerializer
+      properties:
+        schema.registry.url: ${SCHEMA_REGISTRY_URL:http://localhost:8088}
+        auto.register.schemas: true
+        use.latest.version: false
+
+incident:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-me-to-a-long-random-secret-for-dev-only}
+      issuer: ${JWT_ISSUER:incident-platform}
+      ttl-minutes: 240
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+

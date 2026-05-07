@@ -1,0 +1,20 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: auth-service
+
+incident:
+  security:
+    jwt:
+      secret: ${JWT_SECRET:change-me-to-a-long-random-secret-for-dev-only}
+      issuer: ${JWT_ISSUER:incident-platform}
+      ttl-minutes: 240
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
