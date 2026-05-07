@@ -1,0 +1,15 @@
+{
+  "type": "record",
+  "name": "AIAnalysisRequestedEvent",
+  "namespace": "com.example.incidents.events.v1",
+  "fields": [
+    {"name": "requestId", "type": "string"},
+    {"name": "incidentId", "type": "string"},
+    {"name": "analysisType", "type": "string"},
+    {"name": "requestedBy", "type": "string"},
+    {"name": "relevantLogIds", "type": {"type": "array", "items": "string"}, "default": []},
+    {"name": "contextWindowMinutes", "type": "int"},
+    {"name": "requestedAt", "type": "string"}
+  ]
+}
+

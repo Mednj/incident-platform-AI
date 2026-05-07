@@ -1,0 +1,18 @@
+{
+  "type": "record",
+  "name": "AIAnalysisCompletedEvent",
+  "namespace": "com.example.incidents.events.v1",
+  "fields": [
+    {"name": "analysisId", "type": "string"},
+    {"name": "incidentId", "type": "string"},
+    {"name": "summary", "type": "string"},
+    {"name": "likelyCauses", "type": {"type": "array", "items": "string"}, "default": []},
+    {"name": "recommendedNextSteps", "type": {"type": "array", "items": "string"}, "default": []},
+    {"name": "confidence", "type": "double"},
+    {"name": "referencedLogIds", "type": {"type": "array", "items": "string"}, "default": []},
+    {"name": "modelProvider", "type": "string"},
+    {"name": "modelName", "type": "string"},
+    {"name": "completedAt", "type": "string"}
+  ]
+}
+

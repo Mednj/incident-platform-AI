@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "name": "LogReceivedEvent",
+  "namespace": "com.example.incidents.events.v1",
+  "fields": [
+    {"name": "logId", "type": "string"},
+    {"name": "application", "type": "string"},
+    {"name": "environment", "type": "string"},
+    {"name": "severity", "type": "string"},
+    {"name": "occurredAt", "type": "string"},
+    {"name": "traceId", "type": ["null", "string"], "default": null},
+    {"name": "spanId", "type": ["null", "string"], "default": null},
+    {"name": "host", "type": ["null", "string"], "default": null},
+    {"name": "message", "type": "string"},
+    {"name": "attributes", "type": {"type": "map", "values": "string"}, "default": {}},
+    {"name": "sourceType", "type": "string"}
+  ]
+}
+

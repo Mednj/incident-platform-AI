@@ -1,0 +1,19 @@
+{
+  "type": "record",
+  "name": "IncidentCandidateEvent",
+  "namespace": "com.example.incidents.events.v1",
+  "fields": [
+    {"name": "candidateId", "type": "string"},
+    {"name": "fingerprint", "type": "string"},
+    {"name": "affectedService", "type": "string"},
+    {"name": "environment", "type": "string"},
+    {"name": "severity", "type": "string"},
+    {"name": "firstSeenAt", "type": "string"},
+    {"name": "lastSeenAt", "type": "string"},
+    {"name": "sampleLogIds", "type": {"type": "array", "items": "string"}, "default": []},
+    {"name": "sampleMessage", "type": "string"},
+    {"name": "eventCount", "type": "long"},
+    {"name": "groupingReason", "type": "string"}
+  ]
+}
+

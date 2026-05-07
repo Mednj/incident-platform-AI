@@ -1,0 +1,20 @@
+{
+  "type": "record",
+  "name": "LogNormalizedEvent",
+  "namespace": "com.example.incidents.events.v1",
+  "fields": [
+    {"name": "logId", "type": "string"},
+    {"name": "service", "type": "string"},
+    {"name": "environment", "type": "string"},
+    {"name": "severity", "type": "string"},
+    {"name": "occurredAt", "type": "string"},
+    {"name": "traceId", "type": ["null", "string"], "default": null},
+    {"name": "spanId", "type": ["null", "string"], "default": null},
+    {"name": "message", "type": "string"},
+    {"name": "errorClass", "type": ["null", "string"], "default": null},
+    {"name": "stackTraceHash", "type": ["null", "string"], "default": null},
+    {"name": "fingerprint", "type": "string"},
+    {"name": "fields", "type": {"type": "map", "values": "string"}, "default": {}}
+  ]
+}
+
