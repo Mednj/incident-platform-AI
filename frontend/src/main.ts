@@ -139,7 +139,7 @@ class IncidentApi {
             <label>Password <input name="password" type="password" [(ngModel)]="password"></label>
             <button type="submit">Sign in</button>
           </form>
-          <p class="hint">Demo: dev@example.com / password</p>
+          <p class="hint">Demo: dev&#64;example.com / password</p>
         </section>
       </main>
     } @else {
