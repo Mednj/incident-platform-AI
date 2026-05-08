@@ -183,6 +183,16 @@ docs/assets/               README demo visuals
 docker-compose.yml         Local platform runtime
 ```
 
+## Kubernetes Deployment
+
+Kubernetes manifests are available in [`deploy/k8s`](deploy/k8s). They include namespace/config/secrets, Spring Boot service deployments, frontend deployment, ingress routes, HPAs, PostgreSQL for development, and dev Kafka/Schema Registry resources.
+
+The Compose setup is the primary verified local runtime. The Kubernetes files are deployment-readiness manifests intended for local cluster experimentation or as a base for a production deployment that replaces PostgreSQL, Kafka, and Schema Registry with managed services.
+
+```powershell
+kubectl apply -k deploy/k8s
+```
+
 ## Running Locally
 
 Start the full platform:
