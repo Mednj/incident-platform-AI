@@ -1,51 +1,52 @@
 # Incident Platform AI
 
-MVP distributed platform for ingesting logs, processing Kafka events with Avro and Schema Registry, storing incidents in PostgreSQL, and helping developers investigate production issues with AI-assisted analysis.
+A distributed incident investigation platform that ingests production logs, processes them through Kafka with Avro contracts, groups related failures into incidents, and gives developers an AI-assisted workspace for diagnosis.
 
-This project is designed as a portfolio-ready system: small enough to run locally, but structured like a real production platform with service boundaries, event contracts, database migrations, Docker, and Kubernetes manifests.
+The project is built as a realistic engineering MVP: multiple Spring Boot services, Kafka event choreography, Confluent Schema Registry, PostgreSQL persistence, JWT authentication, an Angular investigation UI, Docker Compose for local execution, and Kubernetes manifests for deployment readiness.
 
-## Demo Preview
+## Product Preview
 
-The first screen is the actual investigation workspace: developers can filter incidents, inspect grouped production failures, review metadata, refresh AI analysis, and follow the incident timeline.
+The Angular application opens directly into the investigation workspace. Developers can filter active incidents, inspect grouped failures, review metadata, change status, follow the timeline, and refresh AI analysis.
 
 ![Incident investigation workspace](docs/assets/ui-workspace.svg)
 
-Kafka UI and Schema Registry are included in the local demo so the event-driven architecture is visible, not just described.
+Kafka UI is included in the local environment so the event backbone can be inspected while the demo is running.
 
 ![Kafka UI topics](docs/assets/kafka-ui-topics.svg)
 
+Schema Registry exposes the registered Avro subjects for the platform's Kafka contracts.
+
 ![Schema Registry subjects](docs/assets/schema-registry-subjects.svg)
 
-The full MVP runs locally through Docker Compose with Kafka, Schema Registry, PostgreSQL, backend services, and the Angular frontend.
+The full stack runs locally with Docker Compose.
 
 ![Docker Compose stack](docs/assets/docker-stack.svg)
 
-## Stack
+## Key Features
 
-- Java 17, Spring Boot 3
-- Kafka, Confluent Schema Registry, Avro
-- PostgreSQL, Flyway
-- Angular
-- Docker Compose
-- Kubernetes manifests
+- REST log ingestion for single log events and batch/file uploads.
+- Kafka-based event processing with Avro serialization.
+- Confluent Schema Registry integration for event contract validation.
+- Deterministic log fingerprinting for incident grouping.
+- Incident lifecycle APIs for status, assignment, comments, and timeline.
+- AI analysis workflow with summaries, likely causes, next steps, confidence, and model metadata.
+- JWT authentication with `ADMIN` and `DEVELOPER` roles.
+- Angular dashboard for incident investigation and log search.
+- PostgreSQL persistence with Flyway migrations and seeded demo data.
+- Docker Compose local runtime and Kubernetes deployment manifests.
 
-## Repository Layout
+## Tech Stack
 
-```text
-backend/
-  pom.xml
-  common-events/          Avro schemas and generated Java event classes
-  common-security/        Shared JWT helpers and security configuration
-  ingestion-service/      REST and file/batch log ingestion
-  event-processor-service Kafka log normalization and incident candidate detection
-  incident-service/       Incident persistence and workflow APIs
-  ai-analysis-service/    Pluggable AI analysis worker and APIs
-  notification-service/   Notification event consumer
-  auth-service/           JWT login API
-frontend/                 Angular investigation workspace
-deploy/k8s/               Kubernetes deployment manifests
-docker-compose.yml        Local platform runtime
-```
+| Layer | Technology |
+| --- | --- |
+| Backend | Java 17, Spring Boot 3 |
+| Messaging | Kafka |
+| Contracts | Avro, Confluent Schema Registry |
+| Database | PostgreSQL, Flyway |
+| Frontend | Angular |
+| Auth | JWT |
+| Local runtime | Docker Compose |
+| Deployment | Kubernetes manifests |
 
 ## Architecture
 
@@ -100,17 +101,17 @@ sequenceDiagram
   participant DB as PostgreSQL
   participant AI as ai-analysis-service
 
-  UI->>ING: POST /api/logs
+  UI->>ING: Submit production log
   ING->>SR: Validate LogReceivedEvent schema
   ING->>K: Publish logs.received.v1
-  K->>EP: Consume LogReceivedEvent
+  K->>EP: Consume raw log event
   EP->>K: Publish logs.normalized.v1
   EP->>K: Publish incidents.candidates.v1
-  K->>INC: Consume IncidentCandidateEvent
+  K->>INC: Consume incident candidate
   INC->>DB: Create or update incident by fingerprint
-  UI->>INC: Request incident detail
+  UI->>INC: Load incident detail
   UI->>AI: Refresh AI analysis
-  AI->>DB: Store summary, likely causes, next steps
+  AI->>DB: Store summary, likely causes, and next steps
 ```
 
 ## Data Model
@@ -151,38 +152,9 @@ erDiagram
   }
 ```
 
-## Local Development
+## Kafka Contracts
 
-1. Copy `.env.example` to `.env` and adjust values if needed.
-2. Start infrastructure and services:
-
-```powershell
-docker compose up --build
-```
-
-3. Open the frontend at `http://localhost:4200`.
-4. Login with the seeded demo user:
-
-```text
-email: dev@example.com
-password: password
-```
-
-5. Click **Send demo error log** in the UI. The log moves through Kafka, becomes an incident candidate, is stored as an incident, and can then receive AI analysis.
-
-Useful local URLs:
-
-| Tool | URL | Purpose |
-| --- | --- | --- |
-| Angular UI | `http://localhost:4200` | Investigation dashboard |
-| Kafka UI | `http://localhost:8090` | Topic/message inspection |
-| Schema Registry | `http://localhost:8088/subjects` | Registered Avro subjects |
-| Auth API | `http://localhost:8086` | JWT login |
-| Ingestion API | `http://localhost:8081` | Log ingestion |
-| Incident API | `http://localhost:8083` | Incident workflow |
-| AI Analysis API | `http://localhost:8084` | AI analysis refresh |
-
-## Kafka Topics
+All Kafka payloads are Avro messages generated into Java classes during the Maven build.
 
 | Topic | Avro event |
 | --- | --- |
@@ -193,27 +165,58 @@ Useful local URLs:
 | `ai.analysis.requested.v1` | `AIAnalysisRequestedEvent` |
 | `ai.analysis.completed.v1` | `AIAnalysisCompletedEvent` |
 
-## Core Flow
+## Repository Structure
 
-1. `ingestion-service` receives JSON log payloads and publishes `LogReceivedEvent`.
-2. `event-processor-service` normalizes logs, fingerprints failures, and publishes incident candidates.
-3. `incident-service` creates or updates incidents by fingerprint.
-4. Developers inspect incidents in Angular and request AI analysis.
-5. `ai-analysis-service` generates a deterministic local summary by default, or calls a configured provider adapter.
-6. `notification-service` records/logs new incident notifications.
+```text
+backend/
+  common-events/           Avro schemas and generated Java event classes
+  common-security/         Shared JWT helpers and security configuration
+  ingestion-service/       REST and file/batch log ingestion
+  event-processor-service/ Kafka log normalization and incident candidate detection
+  incident-service/        Incident persistence and workflow APIs
+  ai-analysis-service/     Pluggable AI analysis worker and APIs
+  notification-service/    Notification event consumer
+  auth-service/            JWT login API
+frontend/                  Angular investigation workspace
+deploy/k8s/                Kubernetes deployment manifests
+docs/assets/               README demo visuals
+docker-compose.yml         Local platform runtime
+```
 
-## Demo Script
+## Running Locally
 
-Use this short flow for a portfolio walkthrough:
+Start the full platform:
 
-1. Open the Angular dashboard and show the seeded production incident.
-2. Click **Send demo error log** to create a fresh failure.
-3. Open Kafka UI and show messages appearing on `logs.received.v1`, `logs.normalized.v1`, and `incidents.candidates.v1`.
-4. Open Schema Registry and show the Avro subjects registered for each event contract.
-5. Return to the incident detail page and refresh AI analysis.
-6. Show Docker Desktop or `docker compose ps` to prove the system is running as distributed services.
+```powershell
+docker compose up -d --build
+```
 
-## API Quick Start
+Open the UI:
+
+```text
+http://localhost:4200
+```
+
+Demo account:
+
+```text
+email: dev@example.com
+password: password
+```
+
+Useful local services:
+
+| Service | URL | Purpose |
+| --- | --- | --- |
+| Angular UI | `http://localhost:4200` | Investigation dashboard |
+| Kafka UI | `http://localhost:8090` | Topic and message inspection |
+| Schema Registry | `http://localhost:8088/subjects` | Registered Avro subjects |
+| Auth API | `http://localhost:8086` | JWT login |
+| Ingestion API | `http://localhost:8081` | Log ingestion |
+| Incident API | `http://localhost:8083` | Incident workflow |
+| AI Analysis API | `http://localhost:8084` | AI analysis refresh |
+
+## API Example
 
 Login:
 
@@ -238,30 +241,19 @@ List incidents:
 curl http://localhost:8083/api/incidents -H "Authorization: Bearer <token>"
 ```
 
-## What To Highlight In A Portfolio Walkthrough
-
-- Distributed service design with clear ownership per service.
-- Kafka event choreography using Avro contracts and Schema Registry.
-- Deterministic incident grouping through normalized fingerprints.
-- PostgreSQL migrations and seeded demo data.
-- AI analysis isolated behind a provider interface, with a local deterministic provider for demos.
-- Angular dashboard focused on the developer investigation workflow.
-- Docker Compose for local demo and Kubernetes manifests for deployment readiness.
-
 ## Verification
 
-When Maven is available:
+Backend tests:
 
 ```powershell
 cd backend
 mvn test
 ```
 
-When Node dependencies are installed:
+Frontend build:
 
 ```powershell
 cd frontend
 npm install
-npm test
 npm run build
 ```
