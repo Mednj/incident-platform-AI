@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="520" viewBox="0 0 1400 520" role="img" aria-labelledby="title desc">
+  <title id="title">Docker Compose local stack</title>
+  <desc id="desc">Docker Desktop style list of the local incident platform containers running with exposed ports.</desc>
+  <rect width="1400" height="520" fill="#ffffff"/>
+  <rect x="0" y="0" width="1400" height="42" fill="#f7f9fc" stroke="#e1e6ef"/>
+  <text x="48" y="27" fill="#17233a" font-family="Inter,Segoe UI,Arial" font-size="14" font-weight="800">incident-platform</text>
+  <text x="1210" y="27" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="12">local Docker Compose stack</text>
+  <text x="48" y="76" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Container</text>
+  <text x="440" y="76" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Image</text>
+  <text x="845" y="76" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Ports</text>
+  <text x="1060" y="76" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Status</text>
+  <g font-family="Inter,Segoe UI,Arial" font-size="13" fill="#25334a">
+    <circle cx="28" cy="108" r="6" fill="#2f8f83"/><text x="48" y="113">zookeeper-1</text><text x="440" y="113">confluentinc/cp-zookeeper:7.6.1</text><text x="845" y="113">2181</text><text x="1060" y="113">running</text>
+    <circle cx="28" cy="144" r="6" fill="#2f8f83"/><text x="48" y="149">postgres-1</text><text x="440" y="149">postgres:16-alpine</text><text x="845" y="149">5432:5432</text><text x="1060" y="149">healthy</text>
+    <circle cx="28" cy="180" r="6" fill="#2f8f83"/><text x="48" y="185">kafka-1</text><text x="440" y="185">confluentinc/cp-kafka:7.6.1</text><text x="845" y="185">9092:9092</text><text x="1060" y="185">healthy</text>
+    <circle cx="28" cy="216" r="6" fill="#2f8f83"/><text x="48" y="221">schema-registry-1</text><text x="440" y="221">confluentinc/cp-schema-registry:7.6.1</text><text x="845" y="221">8088:8081</text><text x="1060" y="221">running</text>
+    <circle cx="28" cy="252" r="6" fill="#2f8f83"/><text x="48" y="257">kafka-ui-1</text><text x="440" y="257">provectuslabs/kafka-ui:latest</text><text x="845" y="257">8090:8080</text><text x="1060" y="257">running</text>
+    <circle cx="28" cy="288" r="6" fill="#2f8f83"/><text x="48" y="293">auth-service-1</text><text x="440" y="293">incident-platform-auth-service</text><text x="845" y="293">8086:8080</text><text x="1060" y="293">running</text>
+    <circle cx="28" cy="324" r="6" fill="#2f8f83"/><text x="48" y="329">ingestion-service-1</text><text x="440" y="329">incident-platform-ingestion-service</text><text x="845" y="329">8081:8080</text><text x="1060" y="329">running</text>
+    <circle cx="28" cy="360" r="6" fill="#2f8f83"/><text x="48" y="365">event-processor-service-1</text><text x="440" y="365">incident-platform-event-processor-service</text><text x="845" y="365">internal</text><text x="1060" y="365">running</text>
+    <circle cx="28" cy="396" r="6" fill="#2f8f83"/><text x="48" y="401">incident-service-1</text><text x="440" y="401">incident-platform-incident-service</text><text x="845" y="401">8083:8080</text><text x="1060" y="401">running</text>
+    <circle cx="28" cy="432" r="6" fill="#2f8f83"/><text x="48" y="437">ai-analysis-service-1</text><text x="440" y="437">incident-platform-ai-analysis-service</text><text x="845" y="437">8084:8080</text><text x="1060" y="437">running</text>
+    <circle cx="28" cy="468" r="6" fill="#2f8f83"/><text x="48" y="473">frontend-1</text><text x="440" y="473">incident-platform-frontend</text><text x="845" y="473">4200:80</text><text x="1060" y="473">running</text>
+  </g>
+  <g stroke="#edf1f6">
+    <line x1="0" y1="92" x2="1400" y2="92"/><line x1="0" y1="128" x2="1400" y2="128"/><line x1="0" y1="164" x2="1400" y2="164"/><line x1="0" y1="200" x2="1400" y2="200"/><line x1="0" y1="236" x2="1400" y2="236"/><line x1="0" y1="272" x2="1400" y2="272"/><line x1="0" y1="308" x2="1400" y2="308"/><line x1="0" y1="344" x2="1400" y2="344"/><line x1="0" y1="380" x2="1400" y2="380"/><line x1="0" y1="416" x2="1400" y2="416"/><line x1="0" y1="452" x2="1400" y2="452"/><line x1="0" y1="488" x2="1400" y2="488"/>
+  </g>
+</svg>

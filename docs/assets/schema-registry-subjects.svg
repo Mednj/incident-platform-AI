@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="380" viewBox="0 0 760 380" role="img" aria-labelledby="title desc">
+  <title id="title">Schema Registry subjects endpoint</title>
+  <desc id="desc">Browser view of the Schema Registry subjects endpoint listing Avro event subjects.</desc>
+  <rect width="760" height="380" fill="#ffffff"/>
+  <rect y="0" width="760" height="54" fill="#eaf5f5"/>
+  <circle cx="22" cy="27" r="12" fill="#d6e7e8"/>
+  <text x="58" y="32" fill="#243746" font-family="Inter,Segoe UI,Arial" font-size="15">localhost:8088/subjects</text>
+  <line x1="0" y1="54" x2="760" y2="54" stroke="#d8e2e6"/>
+  <text x="24" y="96" fill="#0b57d0" font-family="Consolas,Menlo,monospace" font-size="16">[</text>
+  <g font-family="Consolas,Menlo,monospace" font-size="16" fill="#15803d">
+    <text x="62" y="134">"ai.analysis.completed.v1-value",</text>
+    <text x="62" y="168">"ai.analysis.requested.v1-value",</text>
+    <text x="62" y="202">"incidents.candidates.v1-value",</text>
+    <text x="62" y="236">"incidents.created.v1-value",</text>
+    <text x="62" y="270">"logs.normalized.v1-value",</text>
+    <text x="62" y="304">"logs.received.v1-value"</text>
+  </g>
+  <text x="24" y="340" fill="#0b57d0" font-family="Consolas,Menlo,monospace" font-size="16">]</text>
+</svg>

@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" role="img" aria-labelledby="title desc">
+  <title id="title">Kafka UI topics view</title>
+  <desc id="desc">Kafka UI showing local topics for logs, incidents, AI analysis, and schema storage.</desc>
+  <rect width="1400" height="420" fill="#ffffff"/>
+  <rect x="0" y="0" width="1400" height="38" fill="#ffffff" stroke="#e4e8ef"/>
+  <text x="18" y="24" fill="#3342ff" font-family="Inter,Segoe UI,Arial" font-size="14" font-weight="800">UI for Apache Kafka</text>
+  <text x="136" y="24" fill="#8574ff" font-family="Inter,Segoe UI,Arial" font-size="13">local v0.7.2</text>
+  <rect x="0" y="38" width="104" height="382" fill="#f7f8fa"/>
+  <text x="14" y="70" fill="#667287" font-family="Inter,Segoe UI,Arial" font-size="12">Dashboard</text>
+  <text x="14" y="96" fill="#17233a" font-family="Inter,Segoe UI,Arial" font-size="12">local</text>
+  <rect x="10" y="130" width="86" height="28" fill="#eef1f6"/>
+  <text x="26" y="149" fill="#3342ff" font-family="Inter,Segoe UI,Arial" font-size="12" font-weight="700">Topics</text>
+  <text x="26" y="182" fill="#667287" font-family="Inter,Segoe UI,Arial" font-size="12">Consumers</text>
+  <text x="26" y="208" fill="#667287" font-family="Inter,Segoe UI,Arial" font-size="12">Schema Registry</text>
+
+  <text x="126" y="74" fill="#101828" font-family="Inter,Segoe UI,Arial" font-size="18" font-weight="800">Topics</text>
+  <rect x="126" y="92" width="480" height="32" rx="4" fill="#ffffff" stroke="#b8c2d2"/>
+  <text x="150" y="113" fill="#8a96a8" font-family="Inter,Segoe UI,Arial" font-size="12">Search by Topic Name</text>
+  <rect x="1222" y="58" width="128" height="32" rx="4" fill="#4f46e5"/>
+  <text x="1248" y="79" fill="#ffffff" font-family="Inter,Segoe UI,Arial" font-size="12" font-weight="700">Add a Topic</text>
+
+  <text x="148" y="168" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Topic Name</text>
+  <text x="444" y="168" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Partitions</text>
+  <text x="588" y="168" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Out of sync replicas</text>
+  <text x="826" y="168" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Replication Factor</text>
+  <text x="1016" y="168" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Number of messages</text>
+  <text x="1240" y="168" fill="#68758a" font-family="Inter,Segoe UI,Arial" font-size="11" font-weight="700">Size</text>
+
+  <g font-family="Inter,Segoe UI,Arial" font-size="12" fill="#17233a">
+    <text x="148" y="200">__consumer_offsets</text><text x="444" y="200">50</text><text x="588" y="200">0</text><text x="826" y="200">1</text><text x="1016" y="200">30</text><text x="1240" y="200">7 KB</text>
+    <text x="148" y="232">__schemas</text><text x="444" y="232">1</text><text x="588" y="232">0</text><text x="826" y="232">1</text><text x="1016" y="232">10</text><text x="1240" y="232">8 KB</text>
+    <text x="148" y="264">ai.analysis.completed.v1</text><text x="444" y="264">1</text><text x="588" y="264">0</text><text x="826" y="264">1</text><text x="1016" y="264">2</text><text x="1240" y="264">1 KB</text>
+    <text x="148" y="296">ai.analysis.requested.v1</text><text x="444" y="296">1</text><text x="588" y="296">0</text><text x="826" y="296">1</text><text x="1016" y="296">2</text><text x="1240" y="296">502 Bytes</text>
+    <text x="148" y="328">incidents.candidates.v1</text><text x="444" y="328">1</text><text x="588" y="328">0</text><text x="826" y="328">1</text><text x="1016" y="328">5</text><text x="1240" y="328">2 KB</text>
+    <text x="148" y="360">incidents.created.v1</text><text x="444" y="360">1</text><text x="588" y="360">0</text><text x="826" y="360">1</text><text x="1016" y="360">2</text><text x="1240" y="360">854 Bytes</text>
+    <text x="148" y="392">logs.normalized.v1</text><text x="444" y="392">1</text><text x="588" y="392">0</text><text x="826" y="392">1</text><text x="1016" y="392">5</text><text x="1240" y="392">2 KB</text>
+  </g>
+</svg>
