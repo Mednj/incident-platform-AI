@@ -51,9 +51,9 @@ public class IncidentRepository {
     List<IncidentView> search(String status, String severity, String service) {
         return jdbc.query("""
                 select * from incidents
-                where (? is null or status = ?)
-                  and (? is null or severity = ?)
-                  and (? is null or affected_service = ?)
+                where (?::text is null or status = ?::text)
+                  and (?::text is null or severity = ?::text)
+                  and (?::text is null or affected_service = ?::text)
                 order by last_seen_at desc
                 limit 100
                 """, this::mapIncident, blankToNull(status), blankToNull(status), blankToNull(severity),
@@ -116,4 +116,3 @@ public class IncidentRepository {
         return value == null || value.isBlank() ? null : value;
     }
 }
-
