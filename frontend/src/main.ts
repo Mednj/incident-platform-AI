@@ -8,7 +8,7 @@ import { authInterceptor } from './shared/auth.interceptor';
 type Severity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
 type LogSeverity = Severity | 'ERROR' | 'WARN';
 type Status = 'OPEN' | 'INVESTIGATING' | 'MITIGATED' | 'RESOLVED' | 'CLOSED';
-type WorkspaceTab = 'overview' | 'incidents' | 'pipeline' | 'schemas' | 'logs' | 'admin';
+type WorkspaceTab = 'overview' | 'demo' | 'incidents' | 'postmortem' | 'slo' | 'notifications' | 'pipeline' | 'schemas' | 'logs' | 'admin';
 
 interface LoginResponse {
   token: string;
@@ -82,6 +82,31 @@ interface DemoLog {
   traceId: string;
   fingerprint: string;
   message: string;
+}
+
+interface ArchitectureStep {
+  label: string;
+  service: string;
+  topic: string;
+  description: string;
+}
+
+interface SloProfile {
+  service: string;
+  objective: string;
+  availability: number;
+  errorBudgetUsed: number;
+  burnRate: string;
+  threshold: string;
+  rationale: string;
+}
+
+interface NotificationChannel {
+  name: string;
+  target: string;
+  mode: string;
+  enabled: boolean;
+  lastPayload: string;
 }
 
 const demoIncidents: Incident[] = [
@@ -200,6 +225,93 @@ const schemaContracts: SchemaContract[] = [
     consumers: ['incident-service', 'notification-service'],
     compatibility: 'BACKWARD',
     fields: ['incidentId', 'summary', 'likelyCauses', 'recommendedNextSteps', 'confidence', 'modelMetadata']
+  }
+];
+
+const architectureSteps: ArchitectureStep[] = [
+  {
+    label: 'Send log',
+    service: 'ingestion-service',
+    topic: 'logs.received.v1',
+    description: 'REST input is validated, converted to Avro, and published as a durable event.'
+  },
+  {
+    label: 'Kafka',
+    service: 'Kafka broker',
+    topic: 'logs.received.v1',
+    description: 'The event backbone decouples producers from downstream processing services.'
+  },
+  {
+    label: 'Normalize',
+    service: 'event-processor-service',
+    topic: 'logs.normalized.v1',
+    description: 'Raw messages are parsed into structured severity, service, trace, error class, and fingerprint fields.'
+  },
+  {
+    label: 'Incident',
+    service: 'incident-service',
+    topic: 'incidents.candidates.v1',
+    description: 'Matching fingerprints update open incidents; new fingerprints create separate incidents.'
+  },
+  {
+    label: 'AI analysis',
+    service: 'ai-analysis-service',
+    topic: 'ai.analysis.completed.v1',
+    description: 'The incident context is summarized into likely causes, next steps, and confidence metadata.'
+  }
+];
+
+const sloProfiles: SloProfile[] = [
+  {
+    service: 'checkout-api',
+    objective: '99.95%',
+    availability: 99.91,
+    errorBudgetUsed: 72,
+    burnRate: '4.8x',
+    threshold: 'Page when payment authorization errors exceed 2% for 10 minutes',
+    rationale: 'HIGH severity because payment authorization is user-facing and grouped failures are still active.'
+  },
+  {
+    service: 'billing-worker',
+    objective: '99.90%',
+    availability: 99.84,
+    errorBudgetUsed: 89,
+    burnRate: '8.1x',
+    threshold: 'Escalate when retry queue depth stays above 10k for 5 minutes',
+    rationale: 'CRITICAL severity because delayed billing retries can create reconciliation and revenue risk.'
+  },
+  {
+    service: 'identity-api',
+    objective: '99.99%',
+    availability: 99.985,
+    errorBudgetUsed: 31,
+    burnRate: '1.4x',
+    threshold: 'Warn when token refresh p95 latency exceeds 850 ms',
+    rationale: 'MEDIUM severity because degraded identity latency is visible but not fully blocking.'
+  }
+];
+
+const notificationChannels: NotificationChannel[] = [
+  {
+    name: 'Slack incident channel',
+    target: '#prod-incidents',
+    mode: 'Mock webhook',
+    enabled: true,
+    lastPayload: 'HIGH checkout-api incident created with 18 grouped events'
+  },
+  {
+    name: 'Email escalation',
+    target: 'platform-oncall@example.com',
+    mode: 'Planned extension',
+    enabled: false,
+    lastPayload: 'Escalation email queued after status moves to INVESTIGATING'
+  },
+  {
+    name: 'PagerDuty bridge',
+    target: 'payments-critical',
+    mode: 'Planned extension',
+    enabled: false,
+    lastPayload: 'CRITICAL incidents can be routed to on-call policy'
   }
 ];
 
@@ -384,7 +496,11 @@ class IncidentApi {
           </div>
           <nav>
             <button [class.active]="tab() === 'overview'" (click)="tab.set('overview')">Overview</button>
+            <button [class.active]="tab() === 'demo'" (click)="tab.set('demo')">Guided Demo</button>
             <button [class.active]="tab() === 'incidents'" (click)="tab.set('incidents')">Incidents</button>
+            <button [class.active]="tab() === 'postmortem'" (click)="tab.set('postmortem')">Postmortem</button>
+            <button [class.active]="tab() === 'slo'" (click)="tab.set('slo')">SLO Budget</button>
+            <button [class.active]="tab() === 'notifications'" (click)="tab.set('notifications')">Notifications</button>
             <button [class.active]="tab() === 'pipeline'" (click)="tab.set('pipeline')">Event Pipeline</button>
             <button [class.active]="tab() === 'schemas'" (click)="tab.set('schemas')">Avro Contracts</button>
             <button [class.active]="tab() === 'logs'" (click)="tab.set('logs')">Log Search</button>
@@ -430,9 +546,39 @@ class IncidentApi {
                 <ol>
                   <li>Validate latest log fingerprint.</li>
                   <li>Check Kafka topics and Avro contract subject.</li>
-                  <li>Refresh analysis and assign owner.</li>
+                  <li>Refresh analysis, inspect SLO burn, and notify owners.</li>
                 </ol>
               </article>
+            </section>
+          }
+
+          @if (tab() === 'demo') {
+            <header class="toolbar">
+              <div>
+                <h2>Guided architecture demo</h2>
+                <p>Replay the path from raw log to Kafka event, normalized fingerprint, incident, and AI-ready analysis.</p>
+              </div>
+              <button (click)="runArchitectureDemo()">Run guided flow</button>
+            </header>
+
+            <section class="architecture-demo">
+              @for (step of architectureSteps; track step.label; let index = $index) {
+                <article [class.active]="index <= activeArchitectureStep()" [class.current]="index === activeArchitectureStep()">
+                  <span>{{ index + 1 }}</span>
+                  <h3>{{ step.label }}</h3>
+                  <p>{{ step.description }}</p>
+                  <code>{{ step.service }} / {{ step.topic }}</code>
+                </article>
+              }
+            </section>
+
+            <section class="demo-console">
+              <div>
+                <p class="eyebrow">Current event</p>
+                <h3>{{ architectureSteps[activeArchitectureStep()].label }}</h3>
+                <p>{{ architectureSteps[activeArchitectureStep()].description }}</p>
+              </div>
+              <pre>{{ architecturePayload() }}</pre>
             </section>
           }
 
@@ -571,6 +717,85 @@ class IncidentApi {
             </section>
           }
 
+          @if (tab() === 'postmortem') {
+            <header class="toolbar">
+              <div>
+                <h2>Postmortem generator</h2>
+                <p>Generate a structured incident report from the selected incident, timeline, SLO impact, and analysis.</p>
+              </div>
+              <button (click)="copyPostmortem()">Copy markdown</button>
+            </header>
+            <section class="postmortem-layout">
+              <article class="postmortem-preview">
+                <pre>{{ postmortemMarkdown() }}</pre>
+              </article>
+              <aside class="postmortem-side">
+                <h3>Included sections</h3>
+                <p>Summary</p>
+                <p>Impact</p>
+                <p>Timeline</p>
+                <p>Likely causes</p>
+                <p>Follow-up actions</p>
+                <p>SLO / error budget context</p>
+              </aside>
+            </section>
+          }
+
+          @if (tab() === 'slo') {
+            <header class="toolbar">
+              <div>
+                <h2>SLO and error budget</h2>
+                <p>Explain severity decisions with service objectives, burn rate, alert thresholds, and user impact.</p>
+              </div>
+            </header>
+            <section class="slo-grid">
+              @for (slo of sloProfiles; track slo.service) {
+                <article class="slo-card">
+                  <div class="slo-head">
+                    <div>
+                      <p class="eyebrow">{{ slo.service }}</p>
+                      <h3>{{ slo.objective }} SLO</h3>
+                    </div>
+                    <strong>{{ slo.burnRate }}</strong>
+                  </div>
+                  <div class="budget-bar"><span [style.width.%]="slo.errorBudgetUsed"></span></div>
+                  <p><b>{{ slo.errorBudgetUsed }}%</b> of monthly error budget consumed. Current availability: <b>{{ slo.availability }}%</b>.</p>
+                  <p><b>Alert threshold:</b> {{ slo.threshold }}</p>
+                  <p><b>Severity rationale:</b> {{ slo.rationale }}</p>
+                </article>
+              }
+            </section>
+          }
+
+          @if (tab() === 'notifications') {
+            <header class="toolbar">
+              <div>
+                <h2>Notification integrations</h2>
+                <p>Local mock mode shows how new and escalated incidents would fan out to Slack, email, or paging.</p>
+              </div>
+              <button (click)="sendMockNotification()">Send Slack mock</button>
+            </header>
+            <section class="notification-grid">
+              @for (channel of notificationChannels; track channel.name) {
+                <article class="notification-card" [class.disabled]="!channel.enabled">
+                  <div>
+                    <p class="eyebrow">{{ channel.mode }}</p>
+                    <h3>{{ channel.name }}</h3>
+                    <p>{{ channel.target }}</p>
+                  </div>
+                  <span>{{ channel.enabled ? 'Enabled' : 'Planned' }}</span>
+                  <code>{{ channel.lastPayload }}</code>
+                </article>
+              }
+            </section>
+            <section class="mock-feed">
+              <h3>Mock delivery feed</h3>
+              @for (message of notificationFeed(); track message) {
+                <p>{{ message }}</p>
+              }
+            </section>
+          }
+
           @if (tab() === 'schemas') {
             <header class="toolbar">
               <div>
@@ -667,6 +892,14 @@ class AppComponent {
   logSeverity = '';
   pipelineStages = pipelineStages;
   schemaContracts = schemaContracts;
+  architectureSteps = architectureSteps;
+  sloProfiles = sloProfiles;
+  notificationChannels = notificationChannels;
+  activeArchitectureStep = signal(0);
+  notificationFeed = signal([
+    '[mock] Slack #prod-incidents received HIGH checkout-api incident notification',
+    '[mock] notification-service consumed incidents.created.v1'
+  ]);
   serviceRegistry = [
     { name: 'checkout-api', owner: 'Payments Platform', runtime: 'Java 17 / Spring Boot', slo: '99.95%' },
     { name: 'billing-worker', owner: 'Revenue Systems', runtime: 'Java 17 / Kafka consumer', slo: '99.90%' },
@@ -676,6 +909,73 @@ class AppComponent {
   totalEvents = computed(() => this.incidents().reduce((sum, incident) => sum + incident.eventCount, 0));
   criticalCount = computed(() => this.incidents().filter(incident => incident.severity === 'CRITICAL').length);
   topService = computed(() => [...this.incidents()].sort((a, b) => this.riskScore(b) - this.riskScore(a))[0]?.affectedService ?? 'No active incidents');
+  architecturePayload = computed(() => {
+    const step = this.architectureSteps[this.activeArchitectureStep()];
+    const incident = this.selected()?.incident ?? this.incidents()[0] ?? demoIncidents[0];
+    return JSON.stringify({
+      step: step.label,
+      service: step.service,
+      topic: step.topic,
+      eventKey: incident.fingerprint,
+      severity: incident.severity,
+      traceId: demoLogs.find(log => log.fingerprint === incident.fingerprint)?.traceId ?? 'trace-demo',
+      timestamp: new Date().toISOString()
+    }, null, 2);
+  });
+  postmortemMarkdown = computed(() => {
+    const detail = this.selected();
+    const incident = detail?.incident ?? this.incidents()[0] ?? demoIncidents[0];
+    const analysis = this.analysis();
+    const slo = this.sloProfiles.find(profile => profile.service === incident.affectedService) ?? this.sloProfiles[0];
+    const causes = analysis?.likelyCauses ?? [
+      'Grouped logs share the same deterministic incident fingerprint.',
+      'Recent failures point to a service-level dependency or timeout path.'
+    ];
+    const nextSteps = analysis?.recommendedNextSteps ?? [
+      'Inspect recent deploys and configuration changes for the affected service.',
+      'Review correlated traces and upstream dependency health around first seen time.',
+      'Attach an owner and move the incident to INVESTIGATING.'
+    ];
+    const timeline = detail?.timeline?.length ? detail.timeline : [
+      { type: 'CREATED', body: 'Incident created from candidate event', createdAt: incident.firstSeenAt },
+      { type: 'UPDATED', body: 'Matching event grouped into incident', createdAt: incident.lastSeenAt }
+    ];
+
+    return [
+      `# Postmortem: ${incident.title}`,
+      '',
+      `**Incident ID:** ${incident.id}`,
+      `**Service:** ${incident.affectedService}`,
+      `**Environment:** ${incident.environment}`,
+      `**Severity:** ${incident.severity}`,
+      `**Status:** ${incident.status}`,
+      `**Fingerprint:** ${incident.fingerprint}`,
+      '',
+      '## Summary',
+      analysis?.summary ?? incident.triggeringSummary,
+      '',
+      '## Impact',
+      `${incident.eventCount} related events were grouped for ${incident.affectedService}. Current SLO is ${slo.objective}, availability is ${slo.availability}%, and ${slo.errorBudgetUsed}% of the monthly error budget is consumed.`,
+      '',
+      '## Timeline',
+      ...timeline.map(item => `- ${this.formatTime(item.createdAt)} - ${item.type}: ${item.body}`),
+      '',
+      '## Root Cause Hypotheses',
+      ...causes.map(cause => `- ${cause}`),
+      '',
+      '## Actions Taken',
+      '- Incident grouped by Avro-backed Kafka event contracts.',
+      '- AI analysis generated a concise investigation summary.',
+      '- Notification mock prepared for Slack delivery.',
+      '',
+      '## Follow-ups',
+      ...nextSteps.map(step => `- ${step}`),
+      '',
+      '## Detection',
+      `Alert threshold: ${slo.threshold}`,
+      `Severity rationale: ${slo.rationale}`
+    ].join('\n');
+  });
 
   constructor(public readonly session: SessionService, private readonly api: IncidentApi) {
     if (this.session.user()) {
@@ -726,9 +1026,35 @@ class AppComponent {
     window.setTimeout(() => void this.select(id), 700);
   }
 
+  async runArchitectureDemo() {
+    this.activeArchitectureStep.set(0);
+    architectureSteps.forEach((_, index) => {
+      window.setTimeout(() => this.activeArchitectureStep.set(index), index * 700);
+    });
+    await this.ingestDemo();
+  }
+
   async ingestDemo() {
     await this.api.ingestDemoLog(this.session.offline());
     window.setTimeout(() => void this.loadIncidents(), 800);
+  }
+
+  async copyPostmortem() {
+    try {
+      await navigator.clipboard.writeText(this.postmortemMarkdown());
+      this.pushNotificationFeed('[local] Postmortem markdown copied to clipboard');
+    } catch {
+      this.pushNotificationFeed('[local] Clipboard blocked, markdown preview remains available');
+    }
+  }
+
+  sendMockNotification() {
+    const incident = this.selected()?.incident ?? this.incidents()[0] ?? demoIncidents[0];
+    this.pushNotificationFeed(`[mock] Slack #prod-incidents <- ${incident.severity} ${incident.affectedService}: ${incident.title}`);
+  }
+
+  pushNotificationFeed(message: string) {
+    this.notificationFeed.update(feed => [`${message} (${new Date().toLocaleTimeString()})`, ...feed].slice(0, 6));
   }
 
   filteredLogs() {
