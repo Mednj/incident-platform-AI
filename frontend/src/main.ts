@@ -556,14 +556,18 @@ class IncidentApi {
             <header class="toolbar">
               <div>
                 <h2>Guided architecture demo</h2>
-                <p>Replay the path from raw log to Kafka event, normalized fingerprint, incident, and AI-ready analysis.</p>
+                <p>Walk through the path from raw log to Kafka event, normalized fingerprint, incident, and AI-ready analysis.</p>
               </div>
-              <button (click)="runArchitectureDemo()">Run guided flow</button>
+              <div class="step-controls">
+                <button type="button" (click)="previousArchitectureStep()" [disabled]="activeArchitectureStep() === 0">Previous</button>
+                <button type="button" (click)="resetArchitectureDemo()">Start over</button>
+                <button type="button" (click)="nextArchitectureStep()" [disabled]="activeArchitectureStep() === architectureSteps.length - 1">Next step</button>
+              </div>
             </header>
 
             <section class="architecture-demo">
               @for (step of architectureSteps; track step.label; let index = $index) {
-                <article [class.active]="index <= activeArchitectureStep()" [class.current]="index === activeArchitectureStep()">
+                <article role="button" tabindex="0" (click)="selectArchitectureStep(index)" (keydown.enter)="selectArchitectureStep(index)" [class.active]="index <= activeArchitectureStep()" [class.current]="index === activeArchitectureStep()">
                   <span>{{ index + 1 }}</span>
                   <h3>{{ step.label }}</h3>
                   <p>{{ step.description }}</p>
@@ -574,9 +578,10 @@ class IncidentApi {
 
             <section class="demo-console">
               <div>
-                <p class="eyebrow">Current event</p>
+                <p class="eyebrow">Step {{ activeArchitectureStep() + 1 }} of {{ architectureSteps.length }}</p>
                 <h3>{{ architectureSteps[activeArchitectureStep()].label }}</h3>
                 <p>{{ architectureSteps[activeArchitectureStep()].description }}</p>
+                <button type="button" (click)="nextArchitectureStep()" [disabled]="activeArchitectureStep() === architectureSteps.length - 1">Continue</button>
               </div>
               <pre>{{ architecturePayload() }}</pre>
             </section>
@@ -1026,12 +1031,21 @@ class AppComponent {
     window.setTimeout(() => void this.select(id), 700);
   }
 
-  async runArchitectureDemo() {
+  async resetArchitectureDemo() {
     this.activeArchitectureStep.set(0);
-    architectureSteps.forEach((_, index) => {
-      window.setTimeout(() => this.activeArchitectureStep.set(index), index * 700);
-    });
     await this.ingestDemo();
+  }
+
+  selectArchitectureStep(index: number) {
+    this.activeArchitectureStep.set(index);
+  }
+
+  previousArchitectureStep() {
+    this.activeArchitectureStep.update(step => Math.max(0, step - 1));
+  }
+
+  nextArchitectureStep() {
+    this.activeArchitectureStep.update(step => Math.min(this.architectureSteps.length - 1, step + 1));
   }
 
   async ingestDemo() {
